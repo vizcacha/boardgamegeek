@@ -518,9 +518,10 @@ class BoardGameGeekNetworkAPI(object):
 
         return hot_items
 
-    def collection(self, user_name):
+    def collection(self, user_name, **kwargs):
         """
-        Returns the user's game collection
+        Returns the user's game collection. Additional keyword arguments are
+        passed as params in the request.
 
         :param str user_name: user name to retrieve the collection for
         :return: ``Collection`` object
@@ -535,10 +536,13 @@ class BoardGameGeekNetworkAPI(object):
         if not user_name:
             raise BoardGameGeekError("no user name specified")
 
+        params = {"username": user_name, "stats": 1}
+        for key, val in kwargs.items():
+            params[key] = val
         try:
             root = get_parsed_xml_response(self.requests_session,
                                            self._collection_api_url,
-                                           params={"username": user_name, "stats": 1},
+                                           params=params,
                                            timeout=self._timeout,
                                            retries=self._retries,
                                            retry_delay=self._retry_delay)
